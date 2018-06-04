@@ -1,23 +1,30 @@
-- job-template: 
-      name: 'MNTLAB-{student}-main-build-job'
-      parameters:
-          - extended-choice:
-              name: BUILDS_TRIGGER
-              description: "Available options"
-              type: checkbox
-              value: "MNTLAB-kgordey-child1-build-job,MNTLAB-kgordey-child2-build-job,MNTLAB-kgordey-child3-build-job,MNTLAB-kgordey-child4-build-job"
-              visible-items: 4
-              multi-select-delimiter: ','                
-      builders:
-          - trigger-builds:
-              - project: "${{BUILDS_TRIGGER}}"
-                predefined-parameters:
-                    BRN=${{BRANCH_NAME}}
-                block: true 
-
-
-- project: 
-        name: MNT-parent
-        student: "kgordey"
-        jobs:
-            - 'MNTLAB-{student}-main-build-job'
+- job-template:
+     name: 'MNTLAB_{name}_master_job'
+     description: "Jenkins lab9"
+     project_type: freestyle
+     parameters:
+        - choice:
+            name: BRANCH_NAME
+            choices:
+                 - master
+                 - kgordey
+        - extended-choice:
+            name: BUILD_TRIGGER
+            type: checkbox
+            value: !join:
+                 - ','
+                 - 
+                     - MNTLAB_mramanchuk_child1_job
+                     - MNTLAB_mramanchuk_child2_job
+                     - MNTLAB_mramanchuk_child3_job
+                     - MNTLAB_mramanchuk_child4_job
+            visible-items: 4
+            multi-select-delimiter: ','
+     builders:
+        - shell: 'echo All is not lost. Not yet.'
+     publishers:
+        - trigger-parameterized-builds:
+            - project: '${{BUILD_TRIGGER}}'
+              predefined-parameters: BRANCH_NAME=${{BRANCH_NAME}}
+              current-parameters: true
+              condition: 'SUCCESS'
